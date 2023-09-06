@@ -6,17 +6,17 @@ typedef std::vector<std::vector<unsigned char>> Matrix;
 typedef std::vector<unsigned char> Vector;
 
 const Matrix A = {
-    {1, 0, 0, 0, 1, 1, 1, 1},
-    {1, 1, 0, 0, 0, 1, 1, 1},
-    {1, 1, 1, 0, 0, 0, 1, 1},
-    {1, 1, 1, 1, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 0, 0, 0},
-    {0, 1, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 1, 1, 1, 1, 1},
     {0, 0, 1, 1, 1, 1, 1, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1}
+    {0, 1, 1, 1, 1, 1, 0, 0},
+    {1, 1, 1, 1, 1, 0, 0, 0},
+    {1, 1, 1, 1, 0, 0, 0, 1},
+    {1, 1, 1, 0, 0, 0, 1, 1},
+    {1, 1, 0, 0, 0, 1, 1, 1},
+    {1, 0, 0, 0, 1, 1, 1, 1}
 };
 
-const Vector c = {0,1,1,0,0,0,1,1};
+const Vector c = {1,1,0,0,0,1,1,0};
 
 Vector MatrixVectorProduct(const Matrix& A, const Vector& b) {
     Vector result(A.size(), 0);
@@ -50,10 +50,12 @@ Vector BinaryStringToVector(const std::string& binaryString) {
 
 void PrintVector(const Vector& vec) {
     for (int i = vec.size() - 1; i >= 0; i--) {
+//    for (int i = 0; i < vec.size(); i++) {
         std::cout << static_cast<int>(vec[i]);
     }
     std::cout << std::endl;
 }
+
 
 int main() {
     std::string binaryString;
@@ -82,8 +84,9 @@ int main() {
     }
 
     for (int i = 0; i < result.size(); i++) {
+    //for (int i = result.size() - 1; i >= 0; i--) {
         result[i] ^= c[i];
-    }
+    } 
 
     std::cout << "Vecteur c : ";
     PrintVector(c);

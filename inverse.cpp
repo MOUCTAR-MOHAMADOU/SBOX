@@ -115,6 +115,20 @@ bitset<32> poly_inv(bitset<32> p)
     return r;
 }
 
+void PrintVector(const vector<bool>& vec) {
+    cout << "Valeur hexadécimale : ";
+    
+    // Lire les 4 premiers bits dans l'ordre décroissant
+    int value1 = 8 * vec[3] + 4 * vec[2] + 2 * vec[1] + vec[0];
+    cout << hex << uppercase << value1;
+
+    // Lire les 4 derniers bits dans l'ordre croissant
+    int value2 = 8 * vec[7] + 4 * vec[6] + 2 * vec[5] + vec[4];
+    cout << hex << uppercase << value2;
+
+    cout << endl;
+}
+
 int main()
 {
     cout << "Entrez un polynôme hexadécimal : ";
@@ -130,6 +144,16 @@ int main()
     cout << "Inverse du polynôme : ";
     bitset<32> inverse = poly_inv(poly);
     print_poly(inverse);
+
+    // Conversion de l'inverse du polynôme en un vecteur de bits
+    vector<bool> inverse_bits;
+    for (int i = 0; i < 32; i++)
+    {
+        inverse_bits.push_back(inverse[i]);
+    }
+
+    // Affichage de la valeur hexadécimale correspondant à l'inverse du polynôme
+    PrintVector(inverse_bits);
 
     return 0;
 }
