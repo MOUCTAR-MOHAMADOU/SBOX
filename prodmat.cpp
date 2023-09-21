@@ -1,98 +1,69 @@
 #include <iostream>
-#include <vector>
 #include <bitset>
 
-typedef std::vector<std::vector<unsigned char>> Matrix;
-typedef std::vector<unsigned char> Vector;
-
-const Matrix A = {
-    {0, 0, 0, 1, 1, 1, 1, 1},
-    {0, 0, 1, 1, 1, 1, 1, 0},
-    {0, 1, 1, 1, 1, 1, 0, 0},
-    {1, 1, 1, 1, 1, 0, 0, 0},
-    {1, 1, 1, 1, 0, 0, 0, 1},
-    {1, 1, 1, 0, 0, 0, 1, 1},
-    {1, 1, 0, 0, 0, 1, 1, 1},
-    {1, 0, 0, 0, 1, 1, 1, 1}
-};
-
-const Vector c = {1,1,0,0,0,1,1,0};
-
-Vector MatrixVectorProduct(const Matrix& A, const Vector& b) {
-    Vector result(A.size(), 0);
-
-    for (int i = 0; i < A.size(); i++) {
-        for (int j = 0; j < A[i].size(); j++) {
-            result[i] ^= A[i][j] * b[j];
+std::bitset<32> hex_to_poly(std::string hex)
+{
+    std::bitset<32> poly;
+    for (char c : hex)
+    {
+        poly <<= 4;
+        if (c >= '0' && c <= '9')
+        {
+            poly |= c - '0';
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+            poly |= c - 'A' + 10;
+        }
+        else if (c >= 'a' && c <= 'f')
+        {
+            poly |= c - 'a' + 10;
+        }
+        else
+        {
+            std::cerr << "Erreur : caractère hexadécimal invalide" << std::endl;
+            exit(1);
         }
     }
-
-    return result;
+    return poly;
 }
 
-Vector BinaryStringToVector(const std::string& binaryString) {
-    Vector result;
-    if (binaryString.size() != 8) {
-        std::cerr << "Le vecteur b doit être un binaire de 8 bits." << std::endl;
-        return result;
-    }
-
-    for (char c : binaryString) {
-        if (c != '0' && c != '1') {
-            std::cerr << "Le vecteur b doit être un binaire de 8 bits." << std::endl;
-            return result;
+std::bitset<32> poly_mul(std::bitset<32> p, std::bitset<32> q)
+{
+    std::bitset<32> r = 0;
+    for (int i = 0; i < 32; i++)
+    {
+        if (q[i] == 1)
+        {
+            r ^= (p << i);
         }
-        result.push_back(c - '0');
     }
-
-    return result;
+    for (int i = 31; i >= 8; i--)
+    {
+        if (r[i] == 1)
+        {
+            r ^= (0x11B << (i - 8));
+        }
+    }
+    return r;
 }
 
-void PrintVector(const Vector& vec) {
-    for (int i = vec.size() - 1; i >= 0; i--) {
-//    for (int i = 0; i < vec.size(); i++) {
-        std::cout << static_cast<int>(vec[i]);
-    }
-    std::cout << std::endl;
+std::bitset<8> calculateResult(std::string hexp, std::string hexq)
+{
+    std::bitset<32> p = hex_to_poly(hexp);
+    std::bitset<32> q = hex_to_poly(hexq);
+    std::bitset<32> result = poly_mul(q, p);
+    std::bitset<8> maskedResult = result.to_ulong() & 0xFF; // Appliquer un masque pour conserver les 8 bits de poids faible
+    return maskedResult;
 }
 
-
-int main() {
-    std::string binaryString;
-    std::cout << "Entrez le vecteur b en binaire de 8 bits : ";
-    std::cin >> binaryString;
-
-    Vector b = BinaryStringToVector(binaryString);
-
-    if (b.empty()) {
-        return 1;
-    }
-
-    if (b.size() != A[0].size()) {
-        std::cerr << "Le vecteur b n'a pas la même taille que la matrice A." << std::endl;
-        return 1;
-    }
-
-    Vector result = MatrixVectorProduct(A, b);
-
-    std::cout << "Résultat du produit matriciel : ";
-    PrintVector(result);
-
-    if (result.size() != c.size()) {
-        std::cerr << "Le vecteur c n'a pas la même taille que le résultat du produit matriciel." << std::endl;
-        return 1;
-    }
-
-    for (int i = 0; i < result.size(); i++) {
-    //for (int i = result.size() - 1; i >= 0; i--) {
-        result[i] ^= c[i];
-    } 
-
-    std::cout << "Vecteur c : ";
-    PrintVector(c);
-
-    std::cout << "Résultat final après XOR avec le vecteur c : ";
-    PrintVector(result);
-
+int main()
+{
+    std::string hex;
+    //std::string hexq = "02";
+    std::cout << "Entrez le chiffre hexadécimal : ";
+    std::cin >> hex;
+    std::bitset<8> result = calculateResult(hex, "03");
+    std::cout << "Résultat : " << result << std::endl;
     return 0;
 }
